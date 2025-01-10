@@ -22,5 +22,6 @@ export const calculateBMI = (height: string, weight: string): number => {
   return Number((weightInKg / (heightInM * heightInM)).toFixed(1));
 };
 export const getWeightCategory = (bmi: number, age: number, sex: string, language: Language): string => {
-  return getBMICategory(bmi, age, sex, matrixData, language);
+  const [year, month, day] = age.toString().split('.');
+  return getBMICategory(bmi, parseInt(year), parseInt(month || '1'), parseInt(day || '1'), sex, matrixData, language);
 }; 

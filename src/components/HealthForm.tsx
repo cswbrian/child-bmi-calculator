@@ -10,7 +10,7 @@ import {
   FormLabel,
   Autocomplete,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 interface Props {
   formData: HealthFormData;
@@ -20,8 +20,6 @@ interface Props {
 
 export const HealthForm = ({ formData, onFormChange, t }: Props) => {
   const currentYear = new Date().getFullYear();
-  const [heightError, setHeightError] = useState<string>('');
-  const [weightError, setWeightError] = useState<string>('');
   
   const years = useMemo(() => {
     const minYear = currentYear - 18;
@@ -41,60 +39,12 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
     []
   );
 
-  const validateHeight = (value: string) => {
-    const height = parseFloat(value);
-    if (value === '') {
-      setHeightError('');
-      return true;
-    }
-    if (isNaN(height)) {
-      setHeightError(t.invalidNumber);
-      return false;
-    }
-    if (height < 0.5) {
-      setHeightError(t.heightTooLow);
-      return false;
-    }
-    if (height > 2.5) {
-      setHeightError(t.heightTooHigh);
-      return false;
-    }
-    setHeightError('');
-    return true;
-  };
-
-  const validateWeight = (value: string) => {
-    const weight = parseFloat(value);
-    if (value === '') {
-      setWeightError('');
-      return true;
-    }
-    if (isNaN(weight)) {
-      setWeightError(t.invalidNumber);
-      return false;
-    }
-    if (weight < 2) {
-      setWeightError(t.weightTooLow);
-      return false;
-    }
-    if (weight > 200) {
-      setWeightError(t.weightTooHigh);
-      return false;
-    }
-    setWeightError('');
-    return true;
-  };
-
   const handleHeightChange = (value: string) => {
-    if (validateHeight(value)) {
-      onFormChange("height", value);
-    }
+    onFormChange("height", value);
   };
 
   const handleWeightChange = (value: string) => {
-    if (validateWeight(value)) {
-      onFormChange("weight", value);
-    }
+    onFormChange("weight", value);
   };
 
   return (
@@ -155,8 +105,6 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
             value={formData.height}
             onChange={(e) => handleHeightChange(e.target.value)}
             size="small"
-            error={!!heightError}
-            helperText={heightError}
             inputProps={{
               step: "0.01",
               min: "0.5",
@@ -173,8 +121,6 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
             value={formData.weight}
             onChange={(e) => handleWeightChange(e.target.value)}
             size="small"
-            error={!!weightError}
-            helperText={weightError}
             inputProps={{
               step: "0.1",
               min: "2",

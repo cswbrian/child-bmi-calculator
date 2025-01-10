@@ -1,24 +1,29 @@
 interface MatrixEntry {
   var: string;
-  age: number;
+  'age.d': number;
   sex: string;
   'cent0.4': number;
   cent2: number;
-  cent9: number;
-  cent25: number;
-  cent50: number;
-  cent75: number;
   cent91: number;
   cent98: number;
   'cent99.6': number;
 }
 
-export const findBMIRanges = (age: number, sex: string, matrix: MatrixEntry[]) => {
+const calculateAgeInDays = (birthYear: number, birthMonth: number, birthDay: number): number => {
+  const birthDate = new Date(birthYear, birthMonth - 1, birthDay); // Month is 0-indexed
+  const today = new Date();
+  const ageInMilliseconds = today.getTime() - birthDate.getTime();
+  return Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+};
+
+export const findBMIRanges = (birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[]) => {
+  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay);
+
   // Find the closest age entry in the matrix for the given sex
   const entry = matrix
     .filter(entry => entry.sex === sex)
     .reduce((prev, curr) => {
-      return Math.abs(curr.age - age) < Math.abs(prev.age - age) ? curr : prev;
+      return Math.abs(curr['age.d'] - ageInDays) < Math.abs(prev['age.d'] - ageInDays) ? curr : prev;
     });
 
   return {
@@ -29,25 +34,24 @@ export const findBMIRanges = (age: number, sex: string, matrix: MatrixEntry[]) =
   };
 };
 
-export const getBMICategory = (bmi: number, age: number, sex: string, matrix: MatrixEntry[], lang: 'zh' | 'en'): string => {
-  const ranges = findBMIRanges(age, sex, matrix);
+export const getBMICategory = (bmi: number, birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[], lang: 'zh' | 'en'): string => {
+  const ranges = findBMIRanges(birthYear, birthMonth, birthDay, sex, matrix);
   
-  // Underweight condition is same for all ages
+  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay);
+  const ageInYears = ageInDays / 365;
+
   if (bmi < ranges.cent2) {
     return lang === 'zh' ? '體重過輕' : 'Underweight';
   }
   
-  // For children age <= 0.2
-  if (age <= 0.2) {
+  if (ageInYears <= 0.2) {
     if (bmi > ranges.cent99_6) {
       return lang === 'zh' ? '肥胖' : 'Obese';
     }
     if (bmi > ranges.cent98 && bmi <= ranges.cent99_6) {
       return lang === 'zh' ? '過重' : 'Overweight';
     }
-  } 
-  // For children age > 0.2
-  else {
+  } else {
     if (bmi > ranges.cent98) {
       return lang === 'zh' ? '肥胖' : 'Obese';
     }
@@ -56,6 +60,5 @@ export const getBMICategory = (bmi: number, age: number, sex: string, matrix: Ma
     }
   }
   
-  // If none of the above conditions are met, the child has normal weight
   return lang === 'zh' ? '正常' : 'Normal';
 }; 
