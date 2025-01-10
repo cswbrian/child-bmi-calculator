@@ -2,7 +2,7 @@ export type Language = 'zh' | 'en';
 
 export const translations = {
   zh: {
-    title: '兒童健康計算器',
+    title: '兒童體重計算器',
     birthDate: '出生日期',
     year: '年',
     month: '月',
@@ -29,9 +29,10 @@ export const translations = {
     heightTooHigh: '身高不能超過 2.5 米',
     weightTooLow: '體重不能少於 2 公斤',
     weightTooHigh: '體重不能超過 200 公斤',
+    dataSource: '資料來源：香港衛生署 2020年兒童生長曲線',
   },
   en: {
-    title: 'Child Health Calculator',
+    title: 'Child BMI Calculator',
     birthDate: 'Birth Date',
     year: 'Year',
     month: 'Month',
@@ -58,5 +59,6 @@ export const translations = {
     heightTooHigh: 'Height cannot exceed 2.5m',
     weightTooLow: 'Weight cannot be less than 2kg',
     weightTooHigh: 'Weight cannot exceed 200kg',
+    dataSource: 'Data Source: Department of Health Hong Kong 2020 Growth Charts',
   },
 } as const; 

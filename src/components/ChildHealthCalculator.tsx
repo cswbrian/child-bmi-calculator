@@ -108,6 +108,19 @@ const ChildHealthCalculator = () => {
             </List>
           </Box>
         )}
+
+        <Box sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+          <Typography variant="caption" color="text.secondary">
+            <a 
+              href="https://www.dh.gov.hk/english/useful/useful_HP_Growth_Chart/useful_HP_Growth_Chart.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit' }}
+            >
+              {t.dataSource}
+            </a>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );
