@@ -7,13 +7,14 @@ import {
   Container, 
   Paper, 
   Typography, 
-  Button,
   Box,
   List,
   ListItem,
   ListItemText,
-  Divider
+  Divider,
+  IconButton
 } from '@mui/material';
+import LanguageIcon from '@mui/icons-material/Language';
 
 const ChildHealthCalculator = () => {
   const [formData, setFormData] = useState<HealthFormData>({
@@ -60,13 +61,13 @@ const ChildHealthCalculator = () => {
           <Typography variant="h5" component="h1">
             {t.title}
           </Typography>
-          <Button 
-            variant="outlined"
-            size="small"
+          <IconButton 
             onClick={toggleLanguage}
+            size="small"
+            aria-label="Toggle language"
           >
-            {t.switchLang}
-          </Button>
+            <LanguageIcon />
+          </IconButton>
         </Box>
 
         <HealthForm

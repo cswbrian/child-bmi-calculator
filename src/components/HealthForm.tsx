@@ -113,7 +113,7 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
                   size="small"
                 />
               )}
-              sx={{ width: "33%" }}
+              sx={{ width: "50%" }}
               disableClearable
             />
             <Autocomplete
@@ -127,7 +127,7 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
                   size="small"
                 />
               )}
-              sx={{ width: "33%" }}
+              sx={{ width: "25%" }}
               disableClearable
             />
             <Autocomplete
@@ -141,7 +141,7 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
                   size="small"
                 />
               )}
-              sx={{ width: "33%" }}
+              sx={{ width: "25%" }}
               disableClearable
             />
           </Box>
