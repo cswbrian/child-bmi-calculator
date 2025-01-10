@@ -21,7 +21,6 @@ export const calculateBMI = (height: string, weight: string): number => {
   const weightInKg = parseFloat(weight);
   return Number((weightInKg / (heightInM * heightInM)).toFixed(1));
 };
-
 export const getWeightCategory = (bmi: number, age: number, sex: string, language: Language): string => {
   return getBMICategory(bmi, age, sex, matrixData, language);
 }; 

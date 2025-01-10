@@ -2,7 +2,7 @@ interface MatrixEntry {
   var: string;
   age: number;
   sex: string;
-  cent0_4: number;
+  'cent0.4': number;
   cent2: number;
   cent9: number;
   cent25: number;
@@ -10,7 +10,7 @@ interface MatrixEntry {
   cent75: number;
   cent91: number;
   cent98: number;
-  cent99_6: number;
+  'cent99.6': number;
 }
 
 export const findBMIRanges = (age: number, sex: string, matrix: MatrixEntry[]) => {
@@ -25,7 +25,7 @@ export const findBMIRanges = (age: number, sex: string, matrix: MatrixEntry[]) =
     cent2: entry.cent2,
     cent91: entry.cent91,
     cent98: entry.cent98,
-    cent99_6: entry.cent99_6
+    cent99_6: entry['cent99.6']
   };
 };
 
