@@ -7,7 +7,7 @@ export const translations = {
     year: '年',
     month: '月',
     day: '日',
-    height: '身高（米）',
+    height: '身高（厘米）',
     weight: '體重（公斤）',
     sex: '性別',
     selectSex: '請選擇',
@@ -60,5 +60,6 @@ export const translations = {
     weightTooLow: 'Weight cannot be less than 2kg',
     weightTooHigh: 'Weight cannot exceed 200kg',
     dataSource: 'Data Source: Department of Health Hong Kong 2020 Growth Charts',
+    heightCmEn: 'Height (cm)',
   },
 } as const; 

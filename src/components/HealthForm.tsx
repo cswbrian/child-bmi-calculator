@@ -106,9 +106,9 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
             onChange={(e) => handleHeightChange(e.target.value)}
             size="small"
             inputProps={{
-              step: "0.01",
-              min: "0.5",
-              max: "2.5",
+              step: "1",
+              min: "50",
+              max: "250",
             }}
           />
         </Grid>

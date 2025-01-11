@@ -17,7 +17,7 @@ export const calculateAge = (birthYear: string, birthMonth: string, birthDay: st
 };
 
 export const calculateBMI = (height: string, weight: string): number => {
-  const heightInM = parseFloat(height);
+  const heightInM = parseFloat(height) / 100;
   const weightInKg = parseFloat(weight);
   return Number((weightInKg / (heightInM * heightInM)).toFixed(1));
 };
