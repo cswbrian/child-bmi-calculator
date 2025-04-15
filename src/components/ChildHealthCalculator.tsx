@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Language, translations } from '../i18n/translations';
 import { HealthForm } from './HealthForm';
+import { BulkDataProcessor } from './BulkDataProcessor';
 import { HealthResults, HealthFormData } from '../types/health';
 import { calculateAge, calculateBMI, getWeightCategory } from '../utils/healthCalculations';
 import { 
@@ -14,7 +15,9 @@ import {
   ListItemText,
   Divider,
   IconButton,
-  Tooltip
+  Tooltip,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import ShareIcon from '@mui/icons-material/Share';
@@ -32,6 +35,7 @@ const ChildHealthCalculator = () => {
   
   const [lang, setLang] = useState<Language>(searchParams.get('lang') as Language || 'zh');
   const [results, setResults] = useState<HealthResults | null>(null);
+  const [activeTab, setActiveTab] = useState(0);
 
   const t = translations[lang];
 
@@ -97,8 +101,13 @@ const ChildHealthCalculator = () => {
     setLang(lang === 'zh' ? 'en' : 'zh');
   };
 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    console.log('event', event);
+    setActiveTab(newValue);
+  };
+
   return (
-    <Container maxWidth="sm">
+    <Container>
       <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h5" component="h1">
@@ -126,43 +135,54 @@ const ChildHealthCalculator = () => {
           </Box>
         </Box>
 
-        <HealthForm
-          formData={formData}
-          onFormChange={handleFormChange}
-          t={t}
-        />
+        <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
+          <Tab label={t.calculate} />
+          <Tab label={t.bulkProcessing} />
+        </Tabs>
 
-        {results && (
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {t.results}
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemText 
-                  primary={`${t.age}：${results.age} ${t.years}`}
-                />
-              </ListItem>
-              <Divider />
-              <ListItem>
-                <ListItemText 
-                  primary={`${t.bmiLabel}：${results.bmi}`}
-                />
-              </ListItem>
-              <Divider />
-              <ListItem>
-                <ListItemText 
-                  primary={`${t.sex}：${formData.sex === 'F' ? t.female : t.male}`}
-                />
-              </ListItem>
-              <Divider />
-              <ListItem>
-                <ListItemText 
-                  primary={`${t.weightStatus}：${results.category}`}
-                />
-              </ListItem>
-            </List>
-          </Box>
+        {activeTab === 0 ? (
+          <>
+            <HealthForm
+              formData={formData}
+              onFormChange={handleFormChange}
+              t={t}
+            />
+
+            {results && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  {t.results}
+                </Typography>
+                <List>
+                  <ListItem>
+                    <ListItemText 
+                      primary={`${t.age}：${results.age} ${t.years}`}
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText 
+                      primary={`${t.bmiLabel}：${results.bmi}`}
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText 
+                      primary={`${t.sex}：${formData.sex === 'F' ? t.female : t.male}`}
+                    />
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText 
+                      primary={`${t.weightStatus}：${results.category}`}
+                    />
+                  </ListItem>
+                </List>
+              </Box>
+            )}
+          </>
+        ) : (
+          <BulkDataProcessor lang={lang} t={t} />
         )}
 
         <Box sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider' }}>
