@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Language, translations } from '../i18n/translations';
 import { HealthForm } from './HealthForm';
 import { HealthResults, HealthFormData } from '../types/health';
@@ -12,27 +13,54 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
+import ShareIcon from '@mui/icons-material/Share';
 
 const ChildHealthCalculator = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [formData, setFormData] = useState<HealthFormData>({
-    birthYear: '',
-    birthMonth: '',
-    birthDay: '',
-    height: '',
-    weight: '',
-    sex: '',
+    birthYear: searchParams.get('birthYear') || '',
+    birthMonth: searchParams.get('birthMonth') || '',
+    birthDay: searchParams.get('birthDay') || '',
+    height: searchParams.get('height') || '',
+    weight: searchParams.get('weight') || '',
+    sex: searchParams.get('sex') || '',
   });
   
-  const [lang, setLang] = useState<Language>('zh');
+  const [lang, setLang] = useState<Language>(searchParams.get('lang') as Language || 'zh');
   const [results, setResults] = useState<HealthResults | null>(null);
 
   const t = translations[lang];
 
   const handleFormChange = (field: keyof HealthFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Update URL parameters when form changes
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set(field, value);
+    } else {
+      newParams.delete(field);
+    }
+    setSearchParams(newParams);
+  };
+
+  const generateShareLink = () => {
+    const params = new URLSearchParams();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+    });
+    params.set('lang', lang);
+    return `${window.location.origin}${window.location.pathname}#/?${params.toString()}`;
+  };
+
+  const handleShare = () => {
+    const shareLink = generateShareLink();
+    navigator.clipboard.writeText(shareLink).then(() => {
+      alert(t.shareLink + ' ' + (lang === 'zh' ? '已複製到剪貼板' : 'copied to clipboard'));
+    });
   };
 
   const isFormComplete = () => {
@@ -41,11 +69,26 @@ const ChildHealthCalculator = () => {
 
   useEffect(() => {
     if (isFormComplete()) {
+      console.log('Form Data:', formData);
       const age = calculateAge(formData.birthYear, formData.birthMonth, formData.birthDay);
+      console.log('Calculated Age:', age);
+      
       const bmi = calculateBMI(formData.height, formData.weight);
-      const category = getWeightCategory(bmi, age, formData.sex, lang);
+      console.log('Calculated BMI:', bmi);
+      
+      const category = getWeightCategory(
+        bmi, 
+        formData.sex, 
+        lang,
+        formData.birthYear,
+        formData.birthMonth,
+        formData.birthDay
+      );
+      console.log('Weight Category:', category);
+      
       setResults({ age, bmi, category });
     } else {
+      console.log('Form is not complete');
       setResults(null);
     }
   }, [formData, lang]);
@@ -61,13 +104,26 @@ const ChildHealthCalculator = () => {
           <Typography variant="h5" component="h1">
             {t.title}
           </Typography>
-          <IconButton 
-            onClick={toggleLanguage}
-            size="small"
-            aria-label="Toggle language"
-          >
-            <LanguageIcon />
-          </IconButton>
+          <Box>
+            <Tooltip title={t.shareLink}>
+              <IconButton 
+                onClick={handleShare}
+                size="small"
+                aria-label="Share link"
+              >
+                <ShareIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={lang === 'zh' ? 'Switch to English' : '切換至中文'}>
+              <IconButton 
+                onClick={toggleLanguage}
+                size="small"
+                aria-label="Toggle language"
+              >
+                <LanguageIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
 
         <HealthForm

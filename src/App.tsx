@@ -1,10 +1,13 @@
+import { HashRouter } from 'react-router-dom';
 import ChildHealthCalculator from './components/ChildHealthCalculator';
 
 const App = () => {
   return (
-    <div>
-      <ChildHealthCalculator />
-    </div>
+    <HashRouter>
+      <div>
+        <ChildHealthCalculator />
+      </div>
+    </HashRouter>
   );
 };
 

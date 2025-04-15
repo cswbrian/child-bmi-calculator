@@ -30,6 +30,7 @@ export const translations = {
     weightTooLow: '體重不能少於 2 公斤',
     weightTooHigh: '體重不能超過 200 公斤',
     dataSource: '資料來源：香港衛生署 2020年兒童生長曲線',
+    shareLink: '分享連結',
   },
   en: {
     title: 'Child BMI Calculator',
@@ -61,5 +62,6 @@ export const translations = {
     weightTooHigh: 'Weight cannot exceed 200kg',
     dataSource: 'Data Source: Department of Health Hong Kong 2020 Growth Charts',
     heightCmEn: 'Height (cm)',
+    shareLink: 'Share Link',
   },
 } as const; 

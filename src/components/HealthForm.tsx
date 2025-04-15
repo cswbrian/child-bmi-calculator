@@ -55,12 +55,24 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
             <Autocomplete
               value={formData.birthYear}
               onChange={(_, newValue) => onFormChange("birthYear", newValue || '')}
+              onInputChange={(_, newInputValue) => {
+                if (newInputValue !== formData.birthYear) {
+                  onFormChange("birthYear", newInputValue);
+                }
+              }}
               options={years}
+              freeSolo
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label={t.year}
                   size="small"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      onFormChange("birthYear", (e.target as HTMLInputElement).value);
+                    }
+                  }}
                 />
               )}
               sx={{ width: "50%" }}
@@ -69,12 +81,24 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
             <Autocomplete
               value={formData.birthMonth}
               onChange={(_, newValue) => onFormChange("birthMonth", newValue || '')}
+              onInputChange={(_, newInputValue) => {
+                if (newInputValue !== formData.birthMonth) {
+                  onFormChange("birthMonth", newInputValue);
+                }
+              }}
               options={months}
+              freeSolo
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label={t.month}
                   size="small"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      onFormChange("birthMonth", (e.target as HTMLInputElement).value);
+                    }
+                  }}
                 />
               )}
               sx={{ width: "25%" }}
@@ -83,12 +107,24 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
             <Autocomplete
               value={formData.birthDay}
               onChange={(_, newValue) => onFormChange("birthDay", newValue || '')}
+              onInputChange={(_, newInputValue) => {
+                if (newInputValue !== formData.birthDay) {
+                  onFormChange("birthDay", newInputValue);
+                }
+              }}
               options={days}
+              freeSolo
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label={t.day}
                   size="small"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      onFormChange("birthDay", (e.target as HTMLInputElement).value);
+                    }
+                  }}
                 />
               )}
               sx={{ width: "25%" }}

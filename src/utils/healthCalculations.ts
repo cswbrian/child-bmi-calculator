@@ -4,11 +4,20 @@ import { getBMICategory } from '../services/bmiService';
 import matrixData from '../data/matrix.json';
 
 export const calculateAge = (birthYear: string, birthMonth: string, birthDay: string): number => {
-  const birthDate = new Date(
-    parseInt(birthYear),
-    parseInt(birthMonth) - 1,
-    parseInt(birthDay)
-  );
+  // Ensure month and day are padded with leading zeros if needed
+  const paddedMonth = birthMonth.padStart(2, '0');
+  const paddedDay = birthDay.padStart(2, '0');
+  
+  // Create date string in YYYY-MM-DD format
+  const dateString = `${birthYear}-${paddedMonth}-${paddedDay}`;
+  const birthDate = new Date(dateString);
+  
+  // Validate the date
+  if (isNaN(birthDate.getTime())) {
+    console.error('Invalid date:', dateString);
+    return 0;
+  }
+  
   const today = new Date();
   
   const years = differenceInYears(today, birthDate);
@@ -21,7 +30,22 @@ export const calculateBMI = (height: string, weight: string): number => {
   const weightInKg = parseFloat(weight);
   return Number((weightInKg / (heightInM * heightInM)).toFixed(1));
 };
-export const getWeightCategory = (bmi: number, age: number, sex: string, language: Language): string => {
-  const [year, month, day] = age.toString().split('.');
-  return getBMICategory(bmi, parseInt(year), parseInt(month || '1'), parseInt(day || '1'), sex, matrixData, language);
+
+export const getWeightCategory = (
+  bmi: number, 
+  sex: string, 
+  language: Language,
+  birthYear: string,
+  birthMonth: string,
+  birthDay: string
+): string => {
+  return getBMICategory(
+    bmi, 
+    parseInt(birthYear), 
+    parseInt(birthMonth), 
+    parseInt(birthDay), 
+    sex, 
+    matrixData, 
+    language
+  );
 }; 
