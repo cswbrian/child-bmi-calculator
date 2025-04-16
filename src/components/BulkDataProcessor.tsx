@@ -17,7 +17,8 @@ import {
 } from '@mui/material';
 import { Upload as UploadIcon, Download as DownloadIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { HealthResults } from '../types/health';
-import { calculateAge, calculateBMI, getWeightCategory } from '../utils/healthCalculations';
+import { calculateBMI, getWeightCategory } from '../utils/healthCalculations';
+import { calculateAgeInMonths, calculateAgeInDays } from '../services/bmiService';
 import { Language } from '../i18n/translations';
 
 interface BulkDataRow {
@@ -27,10 +28,16 @@ interface BulkDataRow {
   height: string;
   weight: string;
   sex: string;
+  assessmentDate: string; // Required field with default value
   [key: string]: string; // Allow for additional columns
 }
 
 interface ProcessedResult extends HealthResults {
+  age: number;
+  ageInMonths: number;
+  ageInDays: number;
+  bmi: number;
+  category: string;
   originalData: BulkDataRow;
   originalColumns: string[];
   originalValues: string[];
@@ -65,6 +72,8 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
         rowData.height = value;
       } else if (col.toLowerCase().includes('weight')) {
         rowData.weight = value;
+      } else if (col.toLowerCase().includes('assessment') && col.toLowerCase().includes('date')) {
+        rowData.assessmentDate = value;
       }
       // Store all original values
       rowData[col] = value;
@@ -73,6 +82,12 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
     // Check if all required fields are present
     if (!rowData.sex || !rowData.birthYear || !rowData.birthMonth || !rowData.birthDay || !rowData.height || !rowData.weight) {
       return { data: null, values: [] };
+    }
+
+    // Set default assessment date if not provided
+    if (!rowData.assessmentDate) {
+      const today = new Date();
+      rowData.assessmentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
 
     return { data: rowData as BulkDataRow, values };
@@ -103,7 +118,18 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
           const paddedMonth = originalData.birthMonth.padStart(2, '0');
           const paddedDay = originalData.birthDay.padStart(2, '0');
 
-          const age = calculateAge(originalData.birthYear, paddedMonth, paddedDay);
+          const ageInMonths = calculateAgeInMonths(
+            parseInt(originalData.birthYear),
+            parseInt(paddedMonth),
+            parseInt(paddedDay),
+            originalData.assessmentDate || ''
+          );
+          const ageInDays = calculateAgeInDays(
+            parseInt(originalData.birthYear),
+            parseInt(paddedMonth),
+            parseInt(paddedDay),
+            originalData.assessmentDate || ''
+          );
           const bmi = calculateBMI(originalData.height, originalData.weight);
           const category = getWeightCategory(
             bmi,
@@ -111,11 +137,14 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
             lang,
             originalData.birthYear,
             paddedMonth,
-            paddedDay
+            paddedDay,
+            originalData.assessmentDate || ''
           );
 
           processedResults.push({ 
-            age, 
+            age: ageInDays / 365.25, // Keep age in years for HealthResults interface
+            ageInMonths,
+            ageInDays,
             bmi, 
             category, 
             originalData,
@@ -140,7 +169,9 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
 
     const headers = [
       ...results[0].originalColumns,
-      'Age (years)',
+      'Age',
+      'Age (months)',
+      'Age (days)',
       'BMI',
       'Weight Status'
     ];
@@ -150,7 +181,9 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
       ...results.map(result => {
         const row = [
           ...result.originalValues,
-          result.age,
+          result.age.toFixed(2),
+          result.ageInMonths,
+          result.ageInDays,
           result.bmi,
           result.category
         ];
@@ -172,7 +205,7 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
   return (
     <Box sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>
           {t.bulkProcessing || 'Bulk Data Processing'}
         </Typography>
 
@@ -221,6 +254,16 @@ export const BulkDataProcessor = ({ lang, t }: BulkDataProcessorProps) => {
               <li>
                 <Typography variant="body2">
                   {t.bulkProcessingNote5 || 'weight: Weight in kilograms (e.g., 25.5)'}
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="body2">
+                  {t.bulkProcessingNote6 || 'assessmentDate: Use YYYY-MM-DD format (e.g., 2024-03-15)'}
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="body2">
+                  {t.bulkProcessingNote7 || 'assessmentDate: Must be later than birth date'}
                 </Typography>
               </li>
             </ul>
@@ -282,6 +325,8 @@ F,2016,12,3,110,20.2`}
                     <TableCell key={index}>{column}</TableCell>
                   ))}
                   <TableCell>{t.age}</TableCell>
+                  <TableCell>{t.ageInMonths}</TableCell>
+                  <TableCell>{t.ageInDays}</TableCell>
                   <TableCell>{t.bmiLabel}</TableCell>
                   <TableCell>{t.weightStatus}</TableCell>
                 </TableRow>
@@ -292,7 +337,9 @@ F,2016,12,3,110,20.2`}
                     {result.originalValues.map((value, colIndex) => (
                       <TableCell key={colIndex}>{value}</TableCell>
                     ))}
-                    <TableCell>{result.age} {t.years}</TableCell>
+                    <TableCell>{result.age.toFixed(2)}</TableCell>
+                    <TableCell>{result.ageInMonths}</TableCell>
+                    <TableCell>{result.ageInDays}</TableCell>
                     <TableCell>{result.bmi}</TableCell>
                     <TableCell>{result.category}</TableCell>
                   </TableRow>

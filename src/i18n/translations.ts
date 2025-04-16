@@ -2,7 +2,7 @@ export type Language = 'zh' | 'en';
 
 export const translations = {
   zh: {
-    title: '兒童體重計算器',
+    calculatorTitle: '兒童體重計算器',
     birthDate: '出生日期',
     year: '年',
     month: '月',
@@ -13,7 +13,6 @@ export const translations = {
     selectSex: '請選擇',
     female: '女',
     male: '男',
-    calculate: '計算結果',
     results: '計算結果',
     age: '年齡',
     years: '歲',
@@ -47,9 +46,16 @@ export const translations = {
     csvExample: `sex,birthYear,birthMonth,birthDay,height,weight
 M,2015,8,15,120,25.5
 F,2016,12,3,110,20.2`,
+    assessmentDate: '評估日期',
+    birthDateError: '出生日期不能晚於評估日期',
+    bulkProcessingNote6: '評估日期：使用 YYYY-MM-DD 格式（例如：2024-03-15）',
+    bulkProcessingNote7: '評估日期：必須晚於出生日期',
+    ageInMonths: '年齡（月）',
+    months: '個月',
+    ageInDays: '年齡（日）',
   },
   en: {
-    title: 'Child BMI Calculator',
+    calculatorTitle: 'Child BMI Calculator',
     birthDate: 'Birth Date',
     year: 'Year',
     month: 'Month',
@@ -60,7 +66,6 @@ F,2016,12,3,110,20.2`,
     selectSex: 'Select',
     female: 'Female',
     male: 'Male',
-    calculate: 'Calculate',
     results: 'Results',
     age: 'Age',
     years: 'years',
@@ -95,5 +100,12 @@ F,2016,12,3,110,20.2`,
     csvExample: `sex,birthYear,birthMonth,birthDay,height,weight
 M,2015,8,15,120,25.5
 F,2016,12,3,110,20.2`,
+    assessmentDate: 'Assessment Date',
+    birthDateError: 'Birth date cannot be later than assessment date',
+    bulkProcessingNote6: 'assessmentDate: Use YYYY-MM-DD format (e.g., 2024-03-15)',
+    bulkProcessingNote7: 'assessmentDate: Must be later than birth date',
+    ageInMonths: 'Age (months)',
+    months: 'months',
+    ageInDays: 'Age (days)',
   },
 } as const; 

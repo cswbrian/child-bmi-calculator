@@ -11,4 +11,5 @@ export interface HealthFormData {
   height: string;
   weight: string;
   sex: string;
+  assessmentDate: string; // YYYY-MM-DD format
 } 

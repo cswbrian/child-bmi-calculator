@@ -51,6 +51,20 @@ export const HealthForm = ({ formData, onFormChange, t }: Props) => {
     <Box sx={{ width: "100%", mt: 2 }}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label={t.assessmentDate}
+            type="date"
+            value={formData.assessmentDate}
+            onChange={(e) => onFormChange("assessmentDate", e.target.value)}
+            size="small"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
           <Box sx={{ display: "flex", gap: 2 }}>
             <Autocomplete
               value={formData.birthYear}

@@ -9,39 +9,52 @@ interface MatrixEntry {
   'cent99.6': number;
 }
 
-const calculateAgeInDays = (birthYear: number, birthMonth: number, birthDay: number): number => {
+export const calculateAgeInDays = (birthYear: number, birthMonth: number, birthDay: number, assessmentDate: string): number => {
   // Create date string in YYYY-MM-DD format
   const paddedMonth = birthMonth.toString().padStart(2, '0');
   const paddedDay = birthDay.toString().padStart(2, '0');
   const dateString = `${birthYear}-${paddedMonth}-${paddedDay}`;
   
   const birthDate = new Date(dateString);
-  const today = new Date();
+  const assessment = new Date(assessmentDate);
   
-  // Validate the date
+  // Validate the dates
   if (isNaN(birthDate.getTime())) {
-    console.error('Invalid date:', dateString);
+    console.error('Invalid birth date:', dateString);
+    return 0;
+  }
+  if (isNaN(assessment.getTime())) {
+    console.error('Invalid assessment date:', assessmentDate);
     return 0;
   }
   
   // Set both dates to midnight to get accurate day difference
   birthDate.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
+  assessment.setHours(0, 0, 0, 0);
   
-  const ageInMilliseconds = today.getTime() - birthDate.getTime();
+  const ageInMilliseconds = assessment.getTime() - birthDate.getTime();
   const ageInDays = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24));
   
   console.log('Birth Date String:', dateString);
-  console.log('Parsed Birth Date:', birthDate.toISOString());
-  console.log('Today:', today.toISOString());
+  console.log('Assessment Date:', assessment.toISOString());
   console.log('Age in milliseconds:', ageInMilliseconds);
   console.log('Age in days:', ageInDays);
   
   return ageInDays;
 };
 
-export const findBMIRanges = (birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[]) => {
-  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay);
+export const calculateAgeInMonths = (birthYear: number, birthMonth: number, birthDay: number, assessmentDate: string): number => {
+  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay, assessmentDate);
+  return Math.floor(ageInDays / 30.44); // Using 30.44 as average days per month
+};
+
+export const calculateAgeInYears = (birthYear: number, birthMonth: number, birthDay: number, assessmentDate: string): number => {
+  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay, assessmentDate);
+  return ageInDays / 365.25; // Using 365.25 to account for leap years
+};
+
+export const findBMIRanges = (birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[], assessmentDate: string) => {
+  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay, assessmentDate);
   console.log('Age in days:', ageInDays);
 
   // Find the closest age entry in the matrix for the given sex
@@ -54,6 +67,7 @@ export const findBMIRanges = (birthYear: number, birthMonth: number, birthDay: n
   console.log('Selected matrix entry:', entry);
 
   return {
+    cent0_4: entry['cent0.4'],
     cent2: entry.cent2,
     cent91: entry.cent91,
     cent98: entry.cent98,
@@ -61,40 +75,39 @@ export const findBMIRanges = (birthYear: number, birthMonth: number, birthDay: n
   };
 };
 
-export const getBMICategory = (bmi: number, birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[], lang: 'zh' | 'en'): string => {
-  const ranges = findBMIRanges(birthYear, birthMonth, birthDay, sex, matrix);
+export const getBMICategory = (bmi: number, birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[], lang: 'zh' | 'en', assessmentDate: string): string => {
+  const ranges = findBMIRanges(birthYear, birthMonth, birthDay, sex, matrix, assessmentDate);
   console.log('BMI Ranges:', ranges);
   
-  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay);
+  const ageInDays = calculateAgeInDays(birthYear, birthMonth, birthDay, assessmentDate);
   const ageInYears = ageInDays / 365.25; // Using 365.25 to account for leap years
+  const ageInMonths = ageInDays / 30.44; // Using 30.44 as average days per month
   console.log('Age in years:', ageInYears);
+  console.log('Age in months:', ageInMonths);
   console.log('Current BMI:', bmi);
 
-  if (bmi < ranges.cent2) {
+  // Check for underweight (BMI < 0.4th centile) - applies to all ages
+  if (bmi < ranges.cent0_4) {
     console.log('Category: Underweight');
     return lang === 'zh' ? '體重過輕' : 'Underweight';
   }
-  
-  if (ageInYears <= 0.2) {
+
+  // Check for overweight based on age
+  if (ageInMonths <= 60) {
+    // For children 0-60 months
     if (bmi > ranges.cent99_6) {
-      console.log('Category: Obese (age <= 0.2)');
-      return lang === 'zh' ? '肥胖' : 'Obese';
-    }
-    if (bmi > ranges.cent98 && bmi <= ranges.cent99_6) {
-      console.log('Category: Overweight (age <= 0.2)');
+      console.log('Category: Overweight (age <= 60 months)');
       return lang === 'zh' ? '過重' : 'Overweight';
     }
-  } else {
+  } else if (ageInYears > 5.0 && ageInYears < 18.0) {
+    // For children >5.0 to <18.0 years
     if (bmi > ranges.cent98) {
-      console.log('Category: Obese (age > 0.2)');
-      return lang === 'zh' ? '肥胖' : 'Obese';
-    }
-    if (bmi > ranges.cent91 && bmi <= ranges.cent98) {
-      console.log('Category: Overweight (age > 0.2)');
+      console.log('Category: Overweight (age >5.0 to <18.0 years)');
       return lang === 'zh' ? '過重' : 'Overweight';
     }
   }
   
+  // All other cases are normal
   console.log('Category: Normal');
   return lang === 'zh' ? '正常' : 'Normal';
 }; 
