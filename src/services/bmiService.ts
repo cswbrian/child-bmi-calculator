@@ -75,6 +75,18 @@ export const findBMIRanges = (birthYear: number, birthMonth: number, birthDay: n
   };
 };
 
+const bmiCategories = {
+  underweight: { en: 'Underweight', zh: '過輕' },
+  lighterThanNormal: { en: 'Lighter than normal', zh: '偏瘦' },
+  normal: { en: 'Normal', zh: '適中' },
+  overweight: { en: 'Overweight', zh: '過重' },
+  obese: { en: 'Obese', zh: '肥胖' }
+} as const;
+
+const translate = (category: keyof typeof bmiCategories, lang: 'en' | 'zh'): string => {
+  return bmiCategories[category][lang];
+};
+
 export const getBMICategory = (bmi: number, birthYear: number, birthMonth: number, birthDay: number, sex: string, matrix: MatrixEntry[], lang: 'zh' | 'en', assessmentDate: string): string => {
   const ranges = findBMIRanges(birthYear, birthMonth, birthDay, sex, matrix, assessmentDate);
   console.log('BMI Ranges:', ranges);
@@ -89,25 +101,40 @@ export const getBMICategory = (bmi: number, birthYear: number, birthMonth: numbe
   // Check for underweight (BMI < 0.4th centile) - applies to all ages
   if (bmi < ranges.cent0_4) {
     console.log('Category: Underweight');
-    return lang === 'zh' ? '體重過輕' : 'Underweight';
+    return translate('underweight', lang);
+  } else if (bmi >= ranges.cent0_4 && bmi < ranges.cent2) {
+    console.log('Category: Lighter than normal');
+    return translate('lighterThanNormal', lang);
   }
 
   // Check for overweight based on age
   if (ageInMonths <= 60) {
     // For children 0-60 months
     if (bmi > ranges.cent99_6) {
+      console.log('Category: Obese (age <= 60 months)');
+      return translate('obese', lang);
+    } else if (bmi > ranges.cent98) {
       console.log('Category: Overweight (age <= 60 months)');
-      return lang === 'zh' ? '過重' : 'Overweight';
+      return translate('overweight', lang);
+    } else if (bmi > ranges.cent2) {
+      console.log('Category: Normal (age <= 60 months)');
+      return translate('normal', lang);
     }
   } else if (ageInYears > 5.0 && ageInYears < 18.0) {
     // For children >5.0 to <18.0 years
     if (bmi > ranges.cent98) {
       console.log('Category: Overweight (age >5.0 to <18.0 years)');
-      return lang === 'zh' ? '過重' : 'Overweight';
+      return translate('obese', lang);
+    } else if (bmi > ranges.cent91) {
+      console.log('Category: Overweight (age >5.0 to <18.0 years)');
+      return translate('overweight', lang);
+    } else if (bmi > ranges.cent2) {
+      console.log('Category: Normal (age >5.0 to <18.0 years)');
+      return translate('normal', lang);
     }
   }
   
   // All other cases are normal
   console.log('Category: Normal');
-  return lang === 'zh' ? '正常' : 'Normal';
+  return translate('normal', lang);
 }; 
